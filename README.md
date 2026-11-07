@@ -40,7 +40,7 @@ It is a self-hosted alternative in spirit to tools like Zapier or n8n, with a mu
 | **Prototyping automations** | Sketch and test a flow visually (with live test runs and per-node results) before turning it into production code. |
 | **Learning & portfolio** | A complete reference for building a workflow engine: validation, safe interpolation, branching, scheduling, SSRF protection, tests. |
 
-AutoLoom is a good fit for small teams, internal tooling, side projects and learning. See [Known limitations](#known-limitations) before using it for heavy or critical workloads.
+AutoLoom is a good fit for small teams, internal tooling, side projects and learning.
 
 ## Features
 
@@ -81,11 +81,6 @@ AutoLoom is a good fit for small teams, internal tooling, side projects and lear
 - **SSRF protection** on the HTTP node: localhost, private ranges, link-local/cloud-metadata addresses and non-HTTP(S) schemes are blocked; resolved IPs are re-checked at connection time to resist DNS rebinding; redirects are not followed
 - Secrets masked in execution history (e.g. `Authorization` headers)
 
-## Screenshots
-
-> Add your own after running the app: put images in `docs/screenshots/` and link them here.
->
-> `![Dashboard](docs/screenshots/overview.png)` · `![Editor](docs/screenshots/editor.png)` · `![Execution detail](docs/screenshots/execution-detail.png)`
 
 ## Tech stack
 
@@ -191,33 +186,6 @@ docker compose up --build          # http://localhost:8080
 | `PUBLIC_API_URL` | | `http://localhost:5000` | Base URL shown in webhook URLs |
 | `SCHEDULER_ENABLED` | | `true` | `false` disables cron on this instance |
 | `VITE_API_URL` (client, build time) | | `/api` | Full API URL when the UI and API are on different hosts, e.g. `https://api.example.com/api` |
-
-## Deployment
-
-Pick one:
-
-### Option A: Free-tier split hosting (Atlas + Render + Netlify)
-Good for demos and portfolios. **Caveat:** free Render services sleep when idle, so scheduled workflows won't fire while asleep and the first webhook after idle is slow.
-
-1. **Database:** create a free cluster on MongoDB Atlas, add a database user, allow network access (`0.0.0.0/0` for a demo), and copy the connection string.
-2. **API on Render:** New → Web Service → connect your GitHub repo.
-   - Root directory: `server` · Build: `npm install` · Start: `node server.js`
-   - Environment: `NODE_ENV=production`, `MONGO_URI=<atlas string>`, `JWT_SECRET`, `ENCRYPTION_KEY`, `PUBLIC_API_URL=https://<your-api>.onrender.com`, `CLIENT_URL=https://<your-site>.netlify.app` (set after step 3, then redeploy)
-   - Check `https://<your-api>.onrender.com/api/health`
-3. **UI on Netlify (or Vercel):** import the same repo.
-   - Base directory: `client` · Build: `npm run build` · Publish: `client/dist`
-   - Environment: `VITE_API_URL=https://<your-api>.onrender.com/api`
-   - `client/public/_redirects` (Netlify) and `client/vercel.json` (Vercel) are already included for SPA routing.
-4. Update `CLIENT_URL` on Render to your final site URL and redeploy the API.
-
-### Option B: Single VPS with Docker (recommended for schedules)
-Works on any Ubuntu server (AWS EC2, DigitalOcean, Hetzner…). Full step-by-step in [`docs/DEPLOYMENT_AWS.md`](docs/DEPLOYMENT_AWS.md). In short:
-```bash
-git clone https://github.com/<you>/autoloom.git && cd autoloom
-cp .env.example .env     # set JWT_SECRET, ENCRYPTION_KEY, PUBLIC_API_URL, CLIENT_URL, WEB_PORT=80
-docker compose up -d --build
-```
-Add HTTPS with Caddy or a load balancer, and run **one** API instance.
 
 ## Testing
 
